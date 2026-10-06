@@ -1,19 +1,8 @@
+
 from flask import Flask, render_template, jsonify
-import random
+from ai_agent import generate_challenge
 
 app = Flask(__name__)
-
-# Outdoor challenges for ROAMIQ
-challenges = [
-    "Walk for 3 minutes and find something yellow around you.",
-    "Find a green leaf and observe its shape.",
-    "Walk for 2 minutes and look for a red object in nature.",
-    "Find a tree and observe its bark carefully.",
-    "Walk 200 steps and look for a bird.",
-    "Find something that can be recycled.",
-    "Walk to a shaded area and spend one quiet minute observing nature.",
-    "Find two different types of leaves around you."
-]
 
 
 @app.route("/")
@@ -23,7 +12,7 @@ def home():
 
 @app.route("/challenge")
 def get_challenge():
-    challenge = random.choice(challenges)
+    challenge = generate_challenge("walking")
 
     return jsonify({
         "challenge": challenge
