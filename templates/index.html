@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,11 +8,13 @@
     <title>ROAMIQ</title>
 
     <style>
+
         body {
             font-family: Arial, sans-serif;
             text-align: center;
             background: #eef7ee;
-            padding: 30px 15px;
+            padding: 25px 15px;
+            margin: 0;
         }
 
         .container {
@@ -19,8 +22,8 @@
             margin: auto;
             background: white;
             padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            border-radius: 25px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.08);
         }
 
         h1 {
@@ -31,7 +34,25 @@
         .tagline {
             font-size: 18px;
             color: #555;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: #f1f8e9;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            font-size: 17px;
+        }
+
+        .number {
+            font-size: 25px;
+            font-weight: bold;
         }
 
         button {
@@ -85,165 +106,375 @@
         input {
             display: none;
         }
+
+        .progress {
+            margin-top: 20px;
+            color: #555;
+        }
+
     </style>
+
 </head>
+
 
 <body>
 
-    <div class="container">
+<div class="container">
 
-        <h1>🌿 ROAMIQ</h1>
+    <h1>🌿 ROAMIQ</h1>
 
-        <p class="tagline">
-            AI that gets you moving.
-        </p>
+    <p class="tagline">
+        AI that gets you moving.
+    </p>
 
-        <!-- Start ROAMIQ -->
-        <button class="start-btn" onclick="startRoamiq()">
-            🎙️ Start ROAMIQ
-        </button>
 
-        <!-- Challenge -->
-        <div id="challenge">
-            Your outdoor challenge will appear here.
+    <!-- SCORE -->
+
+    <div class="stats">
+
+        <div class="stat">
+            🏆<br>
+            <span class="number" id="points">0</span><br>
+            Points
         </div>
 
-        <div id="status"></div>
-
-        <!-- Camera -->
-        <div style="margin-top: 25px;">
-
-            <label for="photoInput">
-                <span class="camera-btn"
-                      style="display:inline-block;
-                             padding:14px 24px;
-                             border-radius:30px;
-                             cursor:pointer;
-                             font-size:17px;">
-                    📷 Take Photo
-                </span>
-            </label>
-
-            <input
-                id="photoInput"
-                type="file"
-                accept="image/*"
-                capture="environment"
-                onchange="showPhoto(event)"
-            >
-
+        <div class="stat">
+            🔥<br>
+            <span class="number" id="streak">0</span><br>
+            Streak
         </div>
 
-        <!-- Photo Preview -->
-        <img id="preview" alt="Your discovery">
-
-        <!-- Verification -->
-        <button
-            class="verify-btn"
-            onclick="verifyDiscovery()">
-            🤖 Verify Discovery
-        </button>
-
-        <div id="verifyMessage"></div>
+        <div class="stat">
+            🌿<br>
+            <span class="number" id="completed">0</span><br>
+            Completed
+        </div>
 
     </div>
 
 
-    <script>
+    <!-- START -->
 
-        // Get a new AI challenge
-        async function startRoamiq() {
+    <button
+        class="start-btn"
+        onclick="startRoamiq()">
+
+        🎙️ Start ROAMIQ
+
+    </button>
+
+
+    <!-- CHALLENGE -->
+
+    <div id="challenge">
+
+        Your outdoor challenge will appear here.
+
+    </div>
+
+
+    <div id="status"></div>
+
+
+    <!-- CAMERA -->
+
+    <div style="margin-top:25px;">
+
+        <label for="photoInput">
+
+            <span
+                class="camera-btn"
+                style="
+                display:inline-block;
+                padding:14px 24px;
+                border-radius:30px;
+                cursor:pointer;
+                font-size:17px;">
+
+                📷 Take Photo
+
+            </span>
+
+        </label>
+
+
+        <input
+            id="photoInput"
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onchange="showPhoto(event)"
+        >
+
+    </div>
+
+
+    <!-- PREVIEW -->
+
+    <img
+        id="preview"
+        alt="Your discovery"
+    >
+
+
+    <!-- VERIFY -->
+
+    <button
+        class="verify-btn"
+        onclick="verifyDiscovery()">
+
+        🤖 Verify Discovery
+
+    </button>
+
+
+    <div id="verifyMessage"></div>
+
+
+    <div class="progress">
+
+        Complete challenges to earn points and build your streak! 🌱
+
+    </div>
+
+</div>
+
+
+<script>
+
+let points = 0;
+let streak = 0;
+let completed = 0;
+
+
+// ----------------------------------
+// START ROAMIQ
+// ----------------------------------
+
+async function startRoamiq() {
+
+    document.getElementById("status").innerText =
+        "🤖 Creating your outdoor challenge...";
+
+    try {
+
+        const response =
+            await fetch("/challenge");
+
+        const data =
+            await response.json();
+
+        const challenge =
+            data.challenge;
+
+        document.getElementById("challenge").innerText =
+            challenge;
+
+        document.getElementById("status").innerText =
+            "🎧 Listen and explore your surroundings!";
+
+        speak(challenge);
+
+    }
+
+    catch(error) {
+
+        document.getElementById("status").innerText =
+            "Something went wrong.";
+
+        console.error(error);
+
+    }
+
+}
+
+
+// ----------------------------------
+// VOICE
+// ----------------------------------
+
+function speak(text) {
+
+    const speech =
+        new SpeechSynthesisUtterance(text);
+
+    speech.lang = "en-US";
+
+    speech.rate = 0.9;
+
+    window.speechSynthesis.cancel();
+
+    window.speechSynthesis.speak(speech);
+
+}
+
+
+// ----------------------------------
+// PHOTO
+// ----------------------------------
+
+function showPhoto(event) {
+
+    const file =
+        event.target.files[0];
+
+    if (!file) {
+        return;
+    }
+
+    const preview =
+        document.getElementById("preview");
+
+    preview.src =
+        URL.createObjectURL(file);
+
+    preview.style.display =
+        "block";
+
+    document.getElementById("verifyMessage").innerText =
+        "📸 Photo captured!";
+
+}
+
+
+// ----------------------------------
+// VERIFY
+// ----------------------------------
+
+async function verifyDiscovery() {
+
+    const photo =
+        document.getElementById("photoInput").files[0];
+
+    const challenge =
+        document.getElementById("challenge").innerText;
+
+
+    if (!photo) {
+
+        document.getElementById("verifyMessage").innerText =
+            "📷 Please take a photo first.";
+
+        return;
+
+    }
+
+
+    document.getElementById("verifyMessage").innerText =
+        "🤖 AI is checking your discovery...";
+
+
+    const formData =
+        new FormData();
+
+    formData.append(
+        "photo",
+        photo
+    );
+
+    formData.append(
+        "challenge",
+        challenge
+    );
+
+
+    try {
+
+        const response =
+            await fetch(
+                "/verify",
+                {
+                    method: "POST",
+                    body: formData
+                }
+            );
+
+
+        const data =
+            await response.json();
+
+
+        const result =
+            data.result;
+
+
+        document.getElementById("verifyMessage").innerText =
+            "🤖 " + result;
+
+
+        speak(result);
+
+
+        // -----------------------------
+        // SUCCESS
+        // -----------------------------
+
+        if (
+            result.toUpperCase().startsWith("YES")
+        ) {
+
+            points += 10;
+
+            streak += 1;
+
+            completed += 1;
+
+
+            updateStats();
+
 
             document.getElementById("status").innerText =
-                "🤖 Creating your challenge...";
-
-            try {
-
-                const response = await fetch("/challenge");
-
-                const data = await response.json();
-
-                const challenge = data.challenge;
-
-                document.getElementById("challenge").innerText =
-                    challenge;
-
-                document.getElementById("status").innerText =
-                    "🎧 Listen and explore your surroundings!";
-
-                speak(challenge);
-
-            } catch (error) {
-
-                document.getElementById("status").innerText =
-                    "Something went wrong. Please try again.";
-
-                console.error(error);
-            }
-        }
+                "🎉 Challenge completed! +10 points";
 
 
-        // AI speaks the challenge
-        function speak(text) {
-
-            const speech =
-                new SpeechSynthesisUtterance(text);
-
-            speech.lang = "en-US";
-
-            speech.rate = 0.9;
-
-            window.speechSynthesis.cancel();
-
-            window.speechSynthesis.speak(speech);
-        }
+            speak(
+                "Challenge completed! You earned ten points."
+            );
 
 
-        // Show captured photo
-        function showPhoto(event) {
+            // Automatically get next challenge
 
-            const file =
-                event.target.files[0];
-
-            if (!file) {
-                return;
-            }
-
-            const preview =
-                document.getElementById("preview");
-
-            preview.src =
-                URL.createObjectURL(file);
-
-            preview.style.display =
-                "block";
-
-            document.getElementById("verifyMessage").innerText =
-                "📸 Photo captured! Ready for AI verification.";
+            setTimeout(
+                startRoamiq,
+                2500
+            );
 
         }
 
+    }
 
-        // Verification placeholder
-        function verifyDiscovery() {
+    catch(error) {
 
-            const photo =
-                document.getElementById("photoInput").files[0];
+        document.getElementById("verifyMessage").innerText =
+            "Something went wrong.";
 
-            if (!photo) {
+        console.error(error);
 
-                document.getElementById("verifyMessage").innerText =
-                    "📷 Please take a photo first.";
+    }
 
-                return;
-            }
+}
 
-            document.getElementById("verifyMessage").innerText =
-                "🤖 Photo captured — AI vision verification will be connected next.";
 
-        }
+// ----------------------------------
+// UPDATE SCORE
+// ----------------------------------
 
-    </script>
+function updateStats() {
+
+    document.getElementById("points").innerText =
+        points;
+
+    document.getElementById("streak").innerText =
+        streak;
+
+    document.getElementById("completed").innerText =
+        completed;
+
+}
+
+</script>
+
 
 </body>
+
 </html>
